@@ -1,6 +1,5 @@
 package com.example.medicalapplication.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +36,9 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MedicalApplicationTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(), // 查看系统是不是暗色模式
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,  //此处禁止默认的动态颜色
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

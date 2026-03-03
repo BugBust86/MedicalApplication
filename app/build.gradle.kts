@@ -1,4 +1,6 @@
-plugins {
+//模块配置文件，告诉Gradle怎么构建这个模块
+plugins {       // 插件区块，声明需要使用的插件
+    // libs 是 版本目录 默认的根命名空间，plugins是对应的插件，后续是其中的id
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -49,7 +51,9 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
