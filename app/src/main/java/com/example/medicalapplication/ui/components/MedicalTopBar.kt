@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -18,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun MedicalTopBar(
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit = { SearchTextField() }   // 默认为智慧医疗文本，还可以传搜索框
+    title: @Composable () -> Unit = { Text("智慧医疗") }   // 默认为智慧医疗文本，还可以传搜索框
 ){
     TopAppBar(
         // 此处期待有@Composable注解、输入为空返回为空的函数，使用必须lambda表达式包裹，直接Text(“”)返回Unit

@@ -1,7 +1,58 @@
 package com.example.medicalapplication.ui.screens
 
 // 绘制主页除顶部bar以外的
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import com.example.medicalapplication.ui.components.BottomNavigationBar
+import com.example.medicalapplication.ui.components.MedicalTopBar
+import com.example.medicalapplication.ui.data.BottomNavItem
+import com.example.medicalapplication.ui.pages.HomePage
+import com.example.medicalapplication.ui.pages.MyAppointmentsPage
+import com.example.medicalapplication.ui.pages.ProfilePage
 
+@Composable
+fun MainScreen() {
+    // 使用 rememberSaveable 在配置更改（如旋转屏幕）后保持选中状态
+    // 使用=，没有用by，所以后续都要.value取值
+    val selectedItem = rememberSaveable(stateSaver = BottomNavItem.saver) {
+        mutableStateOf(BottomNavItem.Home)
+    }
+    // rememberSaveable 默认只能保存可以放入 Android Bundle 的类型（如基本类型、String、Parcelable 等）。而 BottomNavItem 是一个自定义的密封类，默认情况下无法被序列化到 Bundle 中。
+    // var selectedItem by rememberSaveable { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }
+    // var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }，此代码可行，但是配置改变如开启暗色模式会回到默认首页丢失状态
+
+    Scaffold(
+        topBar = { MedicalTopBar() },
+        bottomBar = {
+            // 自定义的底部导航栏组件，内部使用了NavigationBar组件
+            BottomNavigationBar(
+                items = listOf(
+                    BottomNavItem.Home,
+                    BottomNavItem.Appointments,
+                    BottomNavItem.Profile
+                ),
+                selectedItem = selectedItem.value,
+                onItemSelected = { selectedItem.value = it }
+            )
+        }
+    ) { innerPadding ->
+        // 根据选中的项显示对应的页面
+        Box(modifier = Modifier.padding(innerPadding)){
+            when (selectedItem.value) {
+                BottomNavItem.Home -> HomePage()
+                BottomNavItem.Appointments -> MyAppointmentsPage()
+                BottomNavItem.Profile -> ProfilePage()
+            }
+        }
+        // 注意：这里如果需要调整页面内容的内边距，可以结合 innerPadding
+        // 但我们的页面已经 fillMaxSize，所以直接显示即可
+    }
+}
 
 
 //import android.net.http.SslCertificate.restoreState
