@@ -1,4 +1,4 @@
-package com.example.medicalapplication.ui.pages
+package com.example.medicalapplication.ui.content.Message
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,8 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomePage() {
+fun MessageContent() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("首页")
+        Text("消息")
     }
 }

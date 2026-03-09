@@ -4,17 +4,19 @@ package com.example.medicalapplication.ui.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import com.example.medicalapplication.ui.components.BottomNavItem
 import com.example.medicalapplication.ui.components.BottomNavigationBar
 import com.example.medicalapplication.ui.components.MedicalTopBar
-import com.example.medicalapplication.ui.data.BottomNavItem
-import com.example.medicalapplication.ui.pages.HomePage
-import com.example.medicalapplication.ui.pages.MyAppointmentsPage
-import com.example.medicalapplication.ui.pages.ProfilePage
+import com.example.medicalapplication.ui.content.Home.HomeContent
+import com.example.medicalapplication.ui.content.Message.MessageContent
+import com.example.medicalapplication.ui.content.Profile.ProfileContent
 
+// 主页屏幕，
 @Composable
 fun MainScreen() {
     // 使用 rememberSaveable 在配置更改（如旋转屏幕）后保持选中状态
@@ -27,13 +29,19 @@ fun MainScreen() {
     // var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }，此代码可行，但是配置改变如开启暗色模式会回到默认首页丢失状态
 
     Scaffold(
-        topBar = { MedicalTopBar() },
+        topBar = {
+            when (selectedItem.value) {
+                BottomNavItem.Home -> MedicalTopBar(title = { Text("北方协和医院") })
+                BottomNavItem.Message -> MedicalTopBar(title = { Text("消息") })
+                BottomNavItem.Profile -> MedicalTopBar(title = { Text("个人中心") })
+            }
+        },
         bottomBar = {
             // 自定义的底部导航栏组件，内部使用了NavigationBar组件
             BottomNavigationBar(
                 items = listOf(
                     BottomNavItem.Home,
-                    BottomNavItem.Appointments,
+                    BottomNavItem.Message,
                     BottomNavItem.Profile
                 ),
                 selectedItem = selectedItem.value,
@@ -44,9 +52,9 @@ fun MainScreen() {
         // 根据选中的项显示对应的页面
         Box(modifier = Modifier.padding(innerPadding)){
             when (selectedItem.value) {
-                BottomNavItem.Home -> HomePage()
-                BottomNavItem.Appointments -> MyAppointmentsPage()
-                BottomNavItem.Profile -> ProfilePage()
+                BottomNavItem.Home -> HomeContent()
+                BottomNavItem.Message -> MessageContent()
+                BottomNavItem.Profile -> ProfileContent()
             }
         }
         // 注意：这里如果需要调整页面内容的内边距，可以结合 innerPadding

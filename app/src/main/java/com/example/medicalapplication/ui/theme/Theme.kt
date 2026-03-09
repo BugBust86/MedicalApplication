@@ -11,27 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    // 引用Color.kt的颜色变量，对应浅色模板
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = PrimaryGreen,
+    secondary = SecondaryGreen,
+    tertiary = AccentPink,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onBackground = OnBackgroundDark,
+    onSurface = OnSurfaceDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    // 引用Color.kt，对应深色模板
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = PrimaryGreen,
+    secondary = SecondaryGreen,
+    tertiary = AccentPink,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onBackground = OnBackgroundLight,
+    onSurface = OnSurfaceLight
 )
 
 @Composable
@@ -54,6 +50,7 @@ fun MedicalApplicationTheme(
     MaterialTheme(
         colorScheme = colorScheme,   //封装了Color.kt中的全局颜色
         typography = Typography,     //使用了Type.kt中定义的全局字体
+        shapes = Shapes,
         content = content
     )
 }

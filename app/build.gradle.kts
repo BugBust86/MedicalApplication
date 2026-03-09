@@ -55,6 +55,17 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
+    // Retrofit 核心库
+    implementation(libs.retrofit)
+    // JSON 转换器 (这里用 Gson，也可以用 Moshi)
+    implementation(libs.converter.gson)
+    // 协程核心库 (通常已经包含在项目中)
+    implementation(libs.kotlinx.coroutines.android)
+    // ViewModel 的 Compose 支持
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // datastore数据库依赖
+    implementation(libs.androidx.datastore.core)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
