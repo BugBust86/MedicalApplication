@@ -40,7 +40,8 @@ import com.example.medicalapplication.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileContent(
-    onNavigateToPage: (String) -> Unit = {}
+    onNavigateToPage: (String) -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val profileViewModel: ProfileViewModel = viewModel()
     val phoneNumber by profileViewModel.phoneNumber.collectAsState()
@@ -95,6 +96,53 @@ fun ProfileContent(
                             )
                         }
                     }
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // 退出登录按钮
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onLogout() },
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable._return),
+                            contentDescription = "退出登录",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Text(
+                        text = "退出登录",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFFEF4444),
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }

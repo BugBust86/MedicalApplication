@@ -26,6 +26,7 @@ import com.example.medicalapplication.ui.content.Profile.page.ConsultationRecord
 import com.example.medicalapplication.ui.content.Profile.page.InsuranceCardScreen
 import com.example.medicalapplication.ui.content.Profile.page.MedicalCardScreen
 import com.example.medicalapplication.ui.content.Profile.page.PersonalInfoScreen
+import com.example.medicalapplication.viewmodel.AuthViewModel
 
 // 消息页面子路由
 object MessageRoutes {
@@ -44,7 +45,9 @@ object ProfileRoutes {
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    authViewModel: AuthViewModel
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -131,6 +134,9 @@ fun MainScreen() {
                 ProfileContent(
                     onNavigateToPage = { route ->
                         navController.navigate(route)
+                    },
+                    onLogout = {
+                        authViewModel.logout()
                     }
                 )
             }

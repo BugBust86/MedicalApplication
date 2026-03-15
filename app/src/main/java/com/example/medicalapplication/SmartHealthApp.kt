@@ -28,7 +28,7 @@ fun SmartHealthApp(authViewModel: AuthViewModel) {
 
      // 如果 token 有效或登录成功，则显示主页
      if ((isLoggedIn || loginSuccess) && !tokenExpired){
-          MainScreen()
+          MainScreen(authViewModel = authViewModel)
      } else {
           LoginRegisterScreen(
                viewModel = authViewModel
