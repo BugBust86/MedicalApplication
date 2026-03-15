@@ -1,129 +1,167 @@
 package com.example.medicalapplication.ui.screens
 
-// 绘制主页除顶部bar以外的
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.medicalapplication.ui.components.BottomNavItem
 import com.example.medicalapplication.ui.components.BottomNavigationBar
 import com.example.medicalapplication.ui.components.MedicalTopBar
 import com.example.medicalapplication.ui.content.Home.HomeContent
 import com.example.medicalapplication.ui.content.Message.MessageContent
+import com.example.medicalapplication.ui.content.Message.page.ConsultMessageScreen
+import com.example.medicalapplication.ui.content.Message.page.DiseaseScienceScreen
+import com.example.medicalapplication.ui.content.Message.page.HospitalDynamicScreen
+import com.example.medicalapplication.ui.content.Message.page.MyMessageScreen
 import com.example.medicalapplication.ui.content.Profile.ProfileContent
+import com.example.medicalapplication.ui.content.Profile.page.ConsultationRecordScreen
+import com.example.medicalapplication.ui.content.Profile.page.InsuranceCardScreen
+import com.example.medicalapplication.ui.content.Profile.page.MedicalCardScreen
+import com.example.medicalapplication.ui.content.Profile.page.PersonalInfoScreen
 
-// 主页屏幕，
+// 消息页面子路由
+object MessageRoutes {
+    const val HOSPITAL_DYNAMIC = "hospital_dynamic"
+    const val MY_MESSAGE = "my_message"
+    const val CONSULT_MESSAGE = "consult_message"
+    const val DISEASE_SCIENCE = "disease_science"
+}
+
+// 个人中心页面子路由
+object ProfileRoutes {
+    const val PERSONAL_INFO = "personal_info"
+    const val MEDICAL_CARD = "medical_card"
+    const val INSURANCE_CARD = "insurance_card"
+    const val CONSULTATION_RECORD = "consultation_record"
+}
+
 @Composable
 fun MainScreen() {
-    // 使用 rememberSaveable 在配置更改（如旋转屏幕）后保持选中状态
-    // 使用=，没有用by，所以后续都要.value取值
-    val selectedItem = rememberSaveable(stateSaver = BottomNavItem.saver) {
-        mutableStateOf(BottomNavItem.Home)
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    // 根据当前路由获取对应的标题
+    val currentTitle = when (currentDestination?.route) {
+        BottomNavItem.Home.route -> "北方协和医院"
+        BottomNavItem.Message.route -> "消息"
+        BottomNavItem.Profile.route -> "个人中心"
+        MessageRoutes.HOSPITAL_DYNAMIC -> "医院动态"
+        MessageRoutes.MY_MESSAGE -> "我的消息"
+        MessageRoutes.CONSULT_MESSAGE -> "问诊消息"
+        MessageRoutes.DISEASE_SCIENCE -> "专病科普"
+        ProfileRoutes.PERSONAL_INFO -> "个人信息"
+        ProfileRoutes.MEDICAL_CARD -> "就诊卡管理"
+        ProfileRoutes.INSURANCE_CARD -> "医保卡管理"
+        ProfileRoutes.CONSULTATION_RECORD -> "问诊记录"
+        else -> "北方协和医院"
     }
-    // rememberSaveable 默认只能保存可以放入 Android Bundle 的类型（如基本类型、String、Parcelable 等）。而 BottomNavItem 是一个自定义的密封类，默认情况下无法被序列化到 Bundle 中。
-    // var selectedItem by rememberSaveable { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }
-    // var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }，此代码可行，但是配置改变如开启暗色模式会回到默认首页丢失状态
+
+    // 判断是否显示底部导航栏（消息和个人中心子页面不显示）
+    val showBottomBar = currentDestination?.route in listOf(
+        BottomNavItem.Home.route,
+        BottomNavItem.Message.route,
+        BottomNavItem.Profile.route
+    )
+
+    // 判断是否显示返回按钮（消息子页面显示）
+    val showBackButton = !showBottomBar
+
+    // 根据当前路由获取选中的导航项
+    val items = listOf(BottomNavItem.Home, BottomNavItem.Message, BottomNavItem.Profile)
+    val selectedItem = items.firstOrNull { item ->
+        currentDestination?.hierarchy?.any { it.route == item.route } == true
+    } ?: BottomNavItem.Home
 
     Scaffold(
         topBar = {
-            when (selectedItem.value) {
-                BottomNavItem.Home -> MedicalTopBar(title = { Text("北方协和医院") })
-                BottomNavItem.Message -> MedicalTopBar(title = { Text("消息") })
-                BottomNavItem.Profile -> MedicalTopBar(title = { Text("个人中心") })
-            }
+            MedicalTopBar(
+                title = { Text(currentTitle) },
+                showBackButton = showBackButton,
+                onBackClick = { navController.popBackStack() }
+            )
         },
         bottomBar = {
-            // 自定义的底部导航栏组件，内部使用了NavigationBar组件
-            BottomNavigationBar(
-                items = listOf(
-                    BottomNavItem.Home,
-                    BottomNavItem.Message,
-                    BottomNavItem.Profile
-                ),
-                selectedItem = selectedItem.value,
-                onItemSelected = { selectedItem.value = it }
-            )
-        }
-    ) { innerPadding ->
-        // 根据选中的项显示对应的页面
-        Box(modifier = Modifier.padding(innerPadding)){
-            when (selectedItem.value) {
-                BottomNavItem.Home -> HomeContent()
-                BottomNavItem.Message -> MessageContent()
-                BottomNavItem.Profile -> ProfileContent()
+            if (showBottomBar) {
+                BottomNavigationBar(
+                    items = listOf(
+                        BottomNavItem.Home,
+                        BottomNavItem.Message,
+                        BottomNavItem.Profile
+                    ),
+                    selectedItem = selectedItem,
+                    onItemSelected = { item ->
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
         }
-        // 注意：这里如果需要调整页面内容的内边距，可以结合 innerPadding
-        // 但我们的页面已经 fillMaxSize，所以直接显示即可
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = BottomNavItem.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            // 底部导航页面
+            composable(BottomNavItem.Home.route) {
+                HomeContent()
+            }
+            composable(BottomNavItem.Message.route) {
+                MessageContent(
+                    onNavigateToPage = { route ->
+                        navController.navigate(route)
+                    }
+                )
+            }
+            composable(BottomNavItem.Profile.route) {
+                ProfileContent(
+                    onNavigateToPage = { route ->
+                        navController.navigate(route)
+                    }
+                )
+            }
+
+            // 消息子页面
+            composable(MessageRoutes.HOSPITAL_DYNAMIC) {
+                HospitalDynamicScreen()
+            }
+            composable(MessageRoutes.MY_MESSAGE) {
+                MyMessageScreen()
+            }
+            composable(MessageRoutes.CONSULT_MESSAGE) {
+                ConsultMessageScreen()
+            }
+            composable(MessageRoutes.DISEASE_SCIENCE) {
+                DiseaseScienceScreen()
+            }
+
+            // 个人中心子页面
+            composable(ProfileRoutes.PERSONAL_INFO) {
+                PersonalInfoScreen()
+            }
+            composable(ProfileRoutes.MEDICAL_CARD) {
+                MedicalCardScreen()
+            }
+            composable(ProfileRoutes.INSURANCE_CARD) {
+                InsuranceCardScreen()
+            }
+            composable(ProfileRoutes.CONSULTATION_RECORD) {
+                ConsultationRecordScreen()
+            }
+        }
     }
 }
-
-
-//import android.net.http.SslCertificate.restoreState
-//import android.net.http.SslCertificate.saveState
-//import androidx.compose.material3.Button
-//import androidx.compose.material3.Scaffold
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.Composable
-//import androidx.navigation.NavController
-//import androidx.navigation.NavGraph.Companion.findStartDestination
-//import androidx.navigation.compose.currentBackStackEntryAsState
-//import androidx.navigation.compose.rememberNavController
-//@Composable
-//fun MainScreen(onLogout: () -> Unit) {
-//    val mainNavController = rememberNavController()
-//    Scaffold(
-//        bottomBar = { BottomNavigationBar(mainNavController) }
-//    ) { innerPadding ->
-//        NavHost(
-//            navController = mainNavController,
-//            startDestination = "home",
-//            modifier = Modifier.padding(innerPadding)
-//        ) {
-//            composable("home") { HomeTab() }
-//            composable("message") { MessageTab() }
-//            composable("profile") { ProfileTab(onLogout = onLogout) }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun BottomNavigationBar(navController: NavController) {
-//    val items = listOf(
-//        BottomNavItem("home", "首页"),
-//        BottomNavItem("message", "消息"),
-//        BottomNavItem("profile", "我的")
-//    )
-//    BottomNavigation {
-//        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-//        items.forEach { item ->
-//            BottomNavigationItem(
-//                icon = { /* 图标 */ },
-//                label = { Text(item.label) },
-//                selected = currentRoute == item.route,
-//                onClick = {
-//                    navController.navigate(item.route) {
-//                        popUpTo(navController.graph.findStartDestination().id) {
-//                            saveState = true
-//                        }
-//                        launchSingleTop = true
-//                        restoreState = true
-//                    }
-//                }
-//            )
-//        }
-//    }
-//}
-//
-//data class BottomNavItem(val route: String, val label: String)
-//
-//@Composable
-//fun ProfileTab(onLogout: () -> Unit) {
-//    Button(onClick = onLogout) {
-//        Text("登出")
-//    }
-//}

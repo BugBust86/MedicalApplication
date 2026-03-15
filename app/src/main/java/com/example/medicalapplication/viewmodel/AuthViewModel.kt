@@ -44,8 +44,34 @@ class AuthViewModel(
     private val _loginSuccess = MutableStateFlow(false)
     val loginSuccess: StateFlow<Boolean> = _loginSuccess.asStateFlow()
 
-    // TokenManager
-    private val tokenManager = TokenManager(application)
+    // 自动登录状态（检查 token 是否有效）
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    // Token 失效状态（用于通知 UI 跳转到登录页）
+    private val _tokenExpired = MutableStateFlow(false)
+    val tokenExpired: StateFlow<Boolean> = _tokenExpired.asStateFlow()
+
+    // TokenManager（单例模式）
+    private val tokenManager = TokenManager.getInstance(application)
+
+    init {
+        // 初始化时检查 token 是否有效
+        viewModelScope.launch {
+            val isValid = tokenManager.isTokenValid()
+            _isLoggedIn.value = isValid
+            if (isValid) {
+                _loginSuccess.value = true
+            }
+
+            // 监听 token 失效事件
+            tokenManager.tokenExpiredEvent.collect {
+                _tokenExpired.value = true
+                _isLoggedIn.value = false
+                _loginSuccess.value = false
+            }
+        }
+    }
 
     // 更新方法
     fun updateAccount(value: String) {
@@ -95,8 +121,12 @@ class AuthViewModel(
                 if (response.isSuccessful && response.body() != null) {
                     val loginResponse = response.body()!!
                     if (loginResponse.code == 0) {
-                        // 登录成功，保存 token 和 输入进去的手机号、用户名(网络请求)等信息
+                        // 登录成功，保存 token、手机号和过期时间
                         tokenManager.saveToken(loginResponse.token)
+                        tokenManager.savePhone(_account.value)
+                        // token 有效期 10 小时
+                        val expiryTime = System.currentTimeMillis() + (10 * 60 * 60 * 1000L)
+                        tokenManager.saveTokenExpiry(expiryTime)
                         _loginSuccess.value = true
                         println("登录成功，token: ${loginResponse.token}")
                     } else {
@@ -187,5 +217,14 @@ class AuthViewModel(
     // 清除错误信息
     fun clearError() {
         _errorMessage.value = null
+    }
+
+    // 退出登录
+    fun logout() {
+        viewModelScope.launch {
+            tokenManager.clearAll()
+            _loginSuccess.value = false
+            _isLoggedIn.value = false
+        }
     }
 }

@@ -57,6 +57,8 @@ dependencies {
 
     // Retrofit 核心库
     implementation(libs.retrofit)
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // JSON 转换器 (这里用 Gson，也可以用 Moshi)
     implementation(libs.converter.gson)
     // 协程核心库 (通常已经包含在项目中)

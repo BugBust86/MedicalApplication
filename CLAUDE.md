@@ -18,8 +18,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # 运行测试
 ./gradlew test
 
+# 运行单个测试类
+./gradlew test --tests "com.example.medicalapplication.ExampleUnitTest"
+
 # 清理构建
 ./gradlew clean
+
+# 检查依赖更新
+./gradlew dependencyUpdates
 ```
 
 ## Architecture
@@ -39,17 +45,32 @@ app/src/main/java/com/example/medicalapplication/
 │       └── model/               # 请求/响应数据模型
 └── ui/
     ├── screens/
-    │   ├── MainScreen.kt         # 主页面（含底部导航）
+    │   ├── MainScreen.kt         # 主页面（含底部导航 + NavHost）
     │   └── LoginRegisterScreen.kt # 登录注册页面
     ├── content/                 # 页面内容区域
     │   ├── Home/                # 首页
-    │   ├── Message/            # 消息页
-    │   └── Profile/            # 个人中心页
-    ├── components/             # 可复用组件
+    │   │   ├── HomeContent.kt
+    │   │   └── section/
+    │   │       ├── ServiceItem.kt
+    │   │       └── ServiceSection.kt
+    │   ├── Message/              # 消息页
+    │   │   ├── MessageContent.kt
+    │   │   ├── section/
+    │   │   │   └── MessageMenuItem.kt
+    │   │   └── page/              # 消息子页面
+    │   │       ├── HospitalDynamicScreen.kt
+    │   │       ├── MyMessageScreen.kt
+    │   │       ├── ConsultMessageScreen.kt
+    │   │       └── DiseaseScienceScreen.kt
+    │   └── Profile/              # 个人中心页
+    │       ├── ProfileContent.kt
+    │       └── UserInfoSection.kt
+    ├── components/              # 可复用组件
     │   ├── BottomNavigationBar.kt
-    │   ├── MedicalTopBar.kt
+    │   ├── BottomNavItem.kt      # 底部导航项密封类
+    │   ├── MedicalTopBar.kt      # 顶部导航栏（支持返回按钮）
     │   └── SearchTextField.kt
-    └── theme/                  # Compose 主题配置
+    └── theme/                   # Compose 主题配置
 ```
 
 ## Key Dependencies
@@ -66,9 +87,17 @@ app/src/main/java/com/example/medicalapplication/
 
 ## Navigation
 
-应用使用底部导航栏，包含三个 Tab：
+应用使用 NavHost + 底部导航栏，包含三个 Tab：
 - Home (首页) - 显示"北方协和医院"
 - Message (消息)
 - Profile (个人中心)
+
+消息页面有子页面导航（点击列表项进入）：
+- 医院动态 (`hospital_dynamic`)
+- 我的消息 (`my_message`)
+- 问诊消息 (`consult_message`)
+- 专病科普 (`disease_science`)
+
+路由定义在 `MainScreen.kt` 的 `MessageRoutes` 对象中。
 
 当前登录状态逻辑在 `SmartHealthApp.kt` 中（暂时硬编码直接显示 MainScreen）。

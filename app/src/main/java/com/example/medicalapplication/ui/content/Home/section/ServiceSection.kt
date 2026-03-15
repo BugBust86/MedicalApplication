@@ -1,20 +1,19 @@
 package com.example.medicalapplication.ui.content.Home.section
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,59 +51,42 @@ fun ServiceSection(title: String, items: List<ServiceItem>) {
             color = MaterialTheme.colorScheme.surfaceContainer,
             shadowElevation = 4.dp
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+            Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                userScrollEnabled = false
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(items) { item -> ServiceGridItem(item = item) }
+                // 每4个一行
+                items.chunked(4).forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowItems.forEach { item ->
+                            ServiceGridItem(
+                                item = item,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        // 如果不足4个，补齐空白
+                        repeat(4 - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-
-/** @Composable
-fun ServiceSection(title: String, items: List<ServiceItem>){
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        // 白色圆角背景容器
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            shadowElevation = 4.dp
-        ) {   // LazyVerticalGrid实现 4 列网络布局
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                // 禁用 LazyVerticalGrid 的滚动，由外层 LazyColumn 统一处理
-                userScrollEnabled = false
-            ) {
-                items(items) { item -> ServiceGridItem(item = item) }
-            }
-        }
-    }
-} */
-
 // 单个网格项的组件，传入单个网格项的数据模型 ServiceItem
 @Composable
-fun ServiceGridItem(item: ServiceItem) {
+fun ServiceGridItem(
+    item: ServiceItem,
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .size(80.dp)  // 每个格子的大小
             .clickable {
                 // 点击事件，跳转到下一个页面
@@ -120,10 +102,9 @@ fun ServiceGridItem(item: ServiceItem) {
             contentAlignment = Alignment.Center
         ) {
             // 图标
-            Icon(
-                imageVector = item.icon,
+            Image(
+                painter = painterResource(id = item.drawableRes),
                 contentDescription = item.label,
-                tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
         }
